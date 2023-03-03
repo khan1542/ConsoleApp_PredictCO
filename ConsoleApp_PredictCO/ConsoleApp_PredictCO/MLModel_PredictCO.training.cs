@@ -5,9 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.ML.Data;
-using Microsoft.ML.Trainers.FastTree;
 using Microsoft.ML.Trainers;
-using Microsoft.ML.Transforms;
 using Microsoft.ML;
 
 namespace ConsoleApp_PredictCO
@@ -36,11 +34,11 @@ namespace ConsoleApp_PredictCO
         public static IEstimator<ITransformer> BuildPipeline(MLContext mlContext)
         {
             // Data process configuration with pipeline data transformations
-            var pipeline = mlContext.Transforms.Categorical.OneHotEncoding(@"Date", @"Date", outputKind: OneHotEncodingEstimator.OutputKind.Indicator)      
-                                    .Append(mlContext.Transforms.ReplaceMissingValues(@"ParameterId", @"ParameterId"))      
-                                    .Append(mlContext.Transforms.Concatenate(@"Features", new []{@"Date",@"ParameterId"}))      
+            var pipeline = mlContext.Transforms.ReplaceMissingValues(@"ParameterId", @"ParameterId")      
+                                    .Append(mlContext.Transforms.Text.FeaturizeText(inputColumnName:@"Date",outputColumnName:@"Date"))      
+                                    .Append(mlContext.Transforms.Concatenate(@"Features", new []{@"ParameterId",@"Date"}))      
                                     .Append(mlContext.Transforms.NormalizeMinMax(@"Features", @"Features"))      
-                                    .Append(mlContext.Regression.Trainers.FastTreeTweedie(new FastTreeTweedieTrainer.Options(){NumberOfLeaves=2226,MinimumExampleCountPerLeaf=17,NumberOfTrees=534,MaximumBinCountPerFeature=229,FeatureFraction=0.99999999,LearningRate=0.999999776672986,LabelColumnName=@"Value",FeatureColumnName=@"Features"}));
+                                    .Append(mlContext.Regression.Trainers.LbfgsPoissonRegression(new LbfgsPoissonRegressionTrainer.Options(){L1Regularization=18.39882F,L2Regularization=2.891882F,LabelColumnName=@"Value",FeatureColumnName=@"Features"}));
 
             return pipeline;
         }

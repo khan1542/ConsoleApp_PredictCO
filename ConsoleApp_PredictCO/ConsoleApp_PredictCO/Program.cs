@@ -1,22 +1,25 @@
 ﻿using ConsoleApp_PredictCO;
 
 Console.WriteLine("Прогнозирование Степени использования CO,%");
-Console.WriteLine("Введите ID параметра");
-string parameterid = Console.ReadLine();
-Console.WriteLine("Введите дату в формате ДД.ММ.ГГГГ");
-string data = Console.ReadLine();
+Console.WriteLine("Фактическое значение степени использования CO,%:");
+Console.WriteLine("31.12.2022 0:00: 42,35294");
+Console.WriteLine("31.12.2022 8:00: 44,49541");
+Console.WriteLine("31.12.2022 16:00: 43,96135");
 
-//Load sample data
-MLModel_PredictCO.ModelInput sampleData = new MLModel_PredictCO.ModelInput()
+
+string[] dateArr = { "31.12.2022 0:00", "31.12.2022 8:00", "31.12.2022 16:00" };
+
+foreach (string i in dateArr)
 {
-    ParameterId = Convert.ToInt32(parameterid),
-    Date = data,
-};
+    //Load sample data
+    MLModel_PredictCO.ModelInput sampleData = new MLModel_PredictCO.ModelInput()
+    {
+        Date = i,
+    };
+    var predictionResult = MLModel_PredictCO.Predict(sampleData);
+    Console.WriteLine($"Прогнозируемая Степень использования CO,% на {i}: {predictionResult.Score}");
+}
 
-// Make a single prediction on the sample data and print results
-var predictionResult = MLModel_PredictCO.Predict(sampleData);
-
-Console.WriteLine($"\n\nПрогнозируемая Степень использования CO,%: {predictionResult.Score}\n\n");
 Console.WriteLine("=============== End of process, hit any key to finish ===============");
 Console.ReadKey();
 
